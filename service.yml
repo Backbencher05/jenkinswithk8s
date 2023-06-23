@@ -1,0 +1,68 @@
+# - In Kubernetes, a Service is a method for exposing a network application
+#  that is running as one or more Pods in your cluster.
+
+# - As k8s provide LB , behind the screne LB to reverse proxy to connect to 
+# diff- diff pod.
+
+# - to implement LB + proxy in kubernates we have : "service"
+# - hare we also don't have to register , behind the scene all done by 
+
+# k8s, but How?
+  # They are registering automatically using "Selector"/ labels
+
+# There are 3-kind of Service Available 
+# 1. ClusterIP (default, they don't have outside connectivity)
+# 2. NodePort (for connectivity to the outside world)
+# 3. External(Load balancer)
+
+# let's create service
+# apiVersion: v1 
+# kind: Service
+# # name of service
+# metadata:
+#   name: mysvc
+# spec:
+#   selector:
+#     app: web
+#   ports:
+#     - port: 8080  # service port
+#       targetPort: 80
+
+# - here we have not mentioned any type , so by default it has taken as "ClusterIP"
+    # which don't have outside connectivity 
+# commands
+# kubectl get svc 
+# kubectl describe svc 
+# Note: - As our RC is running with 3 pods but thay haven't registered
+#       because selecter doesn't matched i.e in RC we have given app:web and
+#       in our Service we have given selector app: web2
+#       - if we change the selector with same as RC we see the pod will automatically registered because we have selector
+
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mysvc
+  labels:
+    country: US 
+    env: dev 
+spec:
+  type: NodePort
+  selector:
+    app: web
+  ports:
+    - port: 8080
+      targetPort: 80
+      nodePort: 30008 
+
+# Note: - here if we can't provide nodePort IP , it will automatically take 
+          # Range of NodePort IP is 30000 to 32767
+        # - also if we give Service port no and Targetport no as same , than
+            # we can ignode the Targetport key (it's also a good practice to give same  
+            #   port no to service port and target port)
+
+
+
+
+# commands
+# kubectl get services/service/svc
+# minikube service mysvc --url (to get the url )
